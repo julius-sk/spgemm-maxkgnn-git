@@ -184,7 +184,7 @@ def maxk_spgemm(graph_indices, graph_values, input_features, k_value,
         warp4_metadata, num_warps, graph_indptr
     )
 
-class MaxKSpmvWrapper:
+class MaxKSpmmWrapper:
     """
     Wrapper class to manage MaxK kernel metadata and provide easy interface
     """
