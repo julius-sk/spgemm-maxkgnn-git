@@ -1,0 +1,55 @@
+To implement the fix in your training script, you need to modify where the model is created or imported. Here's exactly where to make the changes:
+Modification in Your Training Script
+
+First, import the fix module at the top of your training script, just after your other imports:
+
+python# Add this after your other imports
+from maxk_model_fix import CuSPARSEMaxKSAGE, convert_to_cusparse
+
+Find where your model is created - usually there's a part that looks something like this:
+
+python# Find this part in your code
+if config.model == 'sage':
+    model = MaxKSAGE(
+        in_size=in_size,
+        hid_size=config.hidden_dim, 
+        num_hid_layers=config.hidden_layers,
+        out_size=out_size,
+        maxk=config.maxk,
+        feat_drop=config.dropout,
+        norm=config.norm,
+        nonlinear=config.nonlinear,
+        graph_name=config.dataset
+    ).to(device)
+
+Replace it with the fixed version:
+
+python# Replace your existing model creation with this
+if config.model == 'sage':
+    if config.use_maxk_kernels:
+        # Use the fixed implementation with cuSPARSE
+        model = CuSPARSEMaxKSAGE(
+            in_size=in_size,
+            hid_size=config.hidden_dim, 
+            num_hid_layers=config.hidden_layers,
+            out_size=out_size,
+            maxk=config.maxk,
+            feat_drop=config.dropout,
+            norm=config.norm,
+            nonlinear=config.nonlinear,
+            graph_name=config.dataset
+        ).to(device)
+        print("Using fixed MaxK model with cuSPARSE for message passing")
+    else:
+        # Use the original implementation
+        model = MaxKSAGE(
+            in_size=in_size,
+            hid_size=config.hidden_dim, 
+            num_hid_layers=config.hidden_layers,
+            out_size=out_size,
+            maxk=config.maxk,
+            feat_drop=config.dropout,
+            norm=config.norm,
+            nonlinear=config.nonlinear,
+            graph_name=config.dataset
+        ).to(device)
