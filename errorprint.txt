@@ -1,0 +1,345 @@
+✅ MaxK CUDA kernels loaded for training integration
+2025-07-11 18:02:07,030 - MaxK-Debug - INFO - MaxK kernels imported successfully
+2025-07-11 18:02:07,030 - MaxK-Debug - INFO - All debug modes enabled
+Current process ID: 10259
+
+2025-07-11 18:02:07,034 - GNN_Training - INFO -
+Parameters:
+2025-07-11 18:02:07,035 - GNN_Training - INFO - Parameters:
+DATA_PATH=./data/
+2025-07-11 18:02:07,035 - GNN_Training - INFO - DATA_PATH=./data/
+DATASET=reddit
+2025-07-11 18:02:07,035 - GNN_Training - INFO - DATASET=reddit
+DROPOUT=0.5
+2025-07-11 18:02:07,035 - GNN_Training - INFO - DROPOUT=0.5
+ENABLE_LOOKAHEAD=False
+2025-07-11 18:02:07,035 - GNN_Training - INFO - ENABLE_LOOKAHEAD=False
+EPOCHS=1000
+2025-07-11 18:02:07,035 - GNN_Training - INFO - EPOCHS=1000
+EVALUATE=None
+2025-07-11 18:02:07,035 - GNN_Training - INFO - EVALUATE=None
+GPU=0
+2025-07-11 18:02:07,035 - GNN_Training - INFO - GPU=0
+GRAPH_METADATA_PATH=kernels/w12_nz64_warp_4/
+2025-07-11 18:02:07,035 - GNN_Training - INFO - GRAPH_METADATA_PATH=kernels/w12_nz64_warp_4/
+HIDDEN_DIM=256
+2025-07-11 18:02:07,035 - GNN_Training - INFO - HIDDEN_DIM=256
+HIDDEN_LAYERS=3
+2025-07-11 18:02:07,035 - GNN_Training - INFO - HIDDEN_LAYERS=3
+KERNEL_MODE=auto
+2025-07-11 18:02:07,035 - GNN_Training - INFO - KERNEL_MODE=auto
+MAXK=32
+2025-07-11 18:02:07,035 - GNN_Training - INFO - MAXK=32
+MAXK_FALLBACK_THRESHOLD=0.001
+2025-07-11 18:02:07,035 - GNN_Training - INFO - MAXK_FALLBACK_THRESHOLD=0.001
+MAXK_NUM_WARPS=12
+2025-07-11 18:02:07,035 - GNN_Training - INFO - MAXK_NUM_WARPS=12
+MAXK_WARP_MAX_NZ=64
+2025-07-11 18:02:07,035 - GNN_Training - INFO - MAXK_WARP_MAX_NZ=64
+MODEL=sage
+2025-07-11 18:02:07,035 - GNN_Training - INFO - MODEL=sage
+NONLINEAR=maxk
+2025-07-11 18:02:07,035 - GNN_Training - INFO - NONLINEAR=maxk
+NORM=False
+2025-07-11 18:02:07,035 - GNN_Training - INFO - NORM=False
+PATH=./run/
+2025-07-11 18:02:07,035 - GNN_Training - INFO - PATH=./run/
+PLOT_PATH=./run/plots
+2025-07-11 18:02:07,035 - GNN_Training - INFO - PLOT_PATH=./run/plots
+PROFILE_KERNELS=False
+2025-07-11 18:02:07,036 - GNN_Training - INFO - PROFILE_KERNELS=False
+SAVE_MODEL=False
+2025-07-11 18:02:07,036 - GNN_Training - INFO - SAVE_MODEL=False
+SEED=97
+2025-07-11 18:02:07,036 - GNN_Training - INFO - SEED=97
+SELFLOOP=False
+2025-07-11 18:02:07,036 - GNN_Training - INFO - SELFLOOP=False
+USE_MAXK_KERNELS=True
+2025-07-11 18:02:07,036 - GNN_Training - INFO - USE_MAXK_KERNELS=True
+VALIDATE_KERNELS=False
+2025-07-11 18:02:07,036 - GNN_Training - INFO - VALIDATE_KERNELS=False
+W_LR=0.01
+2025-07-11 18:02:07,036 - GNN_Training - INFO - W_LR=0.01
+W_WEIGHT_DECAY=0
+2025-07-11 18:02:07,036 - GNN_Training - INFO - W_WEIGHT_DECAY=0
+
+2025-07-11 18:02:07,036 - GNN_Training - INFO -
+Training with MaxK CUDA kernel acceleration
+2025-07-11 18:02:07,175 - GNN_Training - INFO - Training with MaxK CUDA kernel acceleration
+Graph name for metadata: reddit
+2025-07-11 18:02:07,175 - GNN_Training - INFO - Graph name for metadata: reddit
+2025-07-11 18:02:14,719 - MaxK-Debug - INFO - Initialized MaxK wrapper for layer_0
+2025-07-11 18:02:14,721 - MaxK-Debug - INFO - Initialized MaxK wrapper for layer_1
+2025-07-11 18:02:14,722 - MaxK-Debug - INFO - Initialized MaxK wrapper for layer_2
+2025-07-11 18:02:14,725 - MaxK-Debug - INFO - Initialized MaxKSAGE model: layers=3, hid_size=256, k=32, nonlinear=maxk
+Using MaxK-accelerated SAGE model
+2025-07-11 18:02:14,726 - GNN_Training - INFO - Using MaxK-accelerated SAGE model
+Model parameters: 558,889 total, 558,889 trainable
+2025-07-11 18:02:14,727 - GNN_Training - INFO - Model parameters: 558,889 total, 558,889 trainable
+Graph statistics: 232965 nodes, 114848857 edges
+2025-07-11 18:02:14,727 - GNN_Training - INFO - Graph statistics: 232965 nodes, 114848857 edges
+Average degree: 492.99
+2025-07-11 18:02:14,727 - GNN_Training - INFO - Average degree: 492.99
+Feature dimension: 602, Hidden dimension: 256
+2025-07-11 18:02:14,727 - GNN_Training - INFO - Feature dimension: 602, Hidden dimension: 256
+MaxK value: 32
+2025-07-11 18:02:14,727 - GNN_Training - INFO - MaxK value: 32
+Training...
+2025-07-11 18:02:14,727 - GNN_Training - INFO - Training...
+2025-07-11 18:02:14,728 - MaxK-Debug - INFO - Setting graph data for MaxKSAGE model: reddit
+2025-07-11 18:02:14,777 - MaxK-Debug - INFO - Graph data for layer_0: 232965 nodes, 114848857 edges
+2025-07-11 18:02:14,824 - MaxK-Debug - INFO - Graph stats for layer_0: avg_degree=492.99, max_degree=21658
+✅ Loaded MaxK metadata for reddit: 1913844 warps
+2025-07-11 18:02:14,881 - MaxK-Debug - INFO - ✅ MaxK metadata loaded for reddit in layer_0
+2025-07-11 18:02:14,881 - MaxK-Debug - INFO - Graph data for layer_1: 232965 nodes, 114848857 edges
+2025-07-11 18:02:14,882 - MaxK-Debug - INFO - Graph stats for layer_1: avg_degree=492.99, max_degree=21658
+✅ Loaded MaxK metadata for reddit: 1913844 warps
+2025-07-11 18:02:14,903 - MaxK-Debug - INFO - ✅ MaxK metadata loaded for reddit in layer_1
+2025-07-11 18:02:14,904 - MaxK-Debug - INFO - Graph data for layer_2: 232965 nodes, 114848857 edges
+2025-07-11 18:02:14,904 - MaxK-Debug - INFO - Graph stats for layer_2: avg_degree=492.99, max_degree=21658
+✅ Loaded MaxK metadata for reddit: 1913844 warps
+2025-07-11 18:02:14,926 - MaxK-Debug - INFO - ✅ MaxK metadata loaded for reddit in layer_2
+2025-07-11 18:02:14,926 - MaxK-Debug - INFO - ✅ Graph data set for MaxK-SAGE model with 3 layers
+2025-07-11 18:02:15,048 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-23.5947, max=21.9417, mean=0.0024, non-zero=1.0000
+2025-07-11 18:02:15,103 - MaxK-Debug - INFO - MaxK forward time: 54.765ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:15,113 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:15,154 - MaxK-Debug - INFO - MaxK SPMM stats for layer_0: min=0.0000, max=27970.8926, mean=109.6736, non-zero=0.9492
+2025-07-11 18:02:15,247 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_0: max_diff=27967.945312, mean_diff=109.697044
+2025-07-11 18:02:15,247 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_0!
+2025-07-11 18:02:15,256 - MaxK-Debug - WARNING - Found 58963450 positions with diff > 0.1
+2025-07-11 18:02:16,518 - MaxK-Debug - WARNING - Position [28151,138]: MaxK=6.6793, DGL=-0.9904, Diff=7.6697
+2025-07-11 18:02:16,519 - MaxK-Debug - WARNING - Position [108551,120]: MaxK=84.3257, DGL=0.5742, Diff=83.7514
+2025-07-11 18:02:16,519 - MaxK-Debug - WARNING - Position [98360,109]: MaxK=100.2352, DGL=0.2660, Diff=99.9692
+2025-07-11 18:02:16,519 - MaxK-Debug - WARNING - Position [82171,52]: MaxK=16.0763, DGL=-0.7203, Diff=16.7966
+2025-07-11 18:02:16,519 - MaxK-Debug - WARNING - Position [73896,40]: MaxK=54.4787, DGL=-0.3582, Diff=54.8369
+2025-07-11 18:02:16,519 - MaxK-Debug - INFO - Aggregation time for layer_0: 1388.729ms using MaxK
+2025-07-11 18:02:16,524 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-22.9171, max=27966.6250, mean=109.6715, non-zero=1.0000
+2025-07-11 18:02:16,532 - MaxK-Debug - INFO - MaxK forward time: 7.892ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:16,533 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:16,559 - MaxK-Debug - INFO - MaxK SPMM stats for layer_1: min=0.0000, max=5062903.0000, mean=15619.6387, non-zero=0.9239
+2025-07-11 18:02:16,595 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_1: max_diff=5062643.500000, mean_diff=15618.583984
+2025-07-11 18:02:16,595 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_1!
+2025-07-11 18:02:16,596 - MaxK-Debug - WARNING - Found 59633957 positions with diff > 0.1
+2025-07-11 18:02:17,850 - MaxK-Debug - WARNING - Position [187132,217]: MaxK=2291.6992, DGL=-71.7241, Diff=2363.4233
+2025-07-11 18:02:17,850 - MaxK-Debug - WARNING - Position [6475,142]: MaxK=3402.1150, DGL=23.8656, Diff=3378.2495
+2025-07-11 18:02:17,850 - MaxK-Debug - WARNING - Position [54899,123]: MaxK=963.4455, DGL=56.3292, Diff=907.1163
+2025-07-11 18:02:17,850 - MaxK-Debug - WARNING - Position [195095,9]: MaxK=0.0000, DGL=-145.2142, Diff=145.2142
+2025-07-11 18:02:17,850 - MaxK-Debug - WARNING - Position [78970,161]: MaxK=1806.9969, DGL=-54.8216, Diff=1861.8186
+2025-07-11 18:02:17,850 - MaxK-Debug - INFO - Aggregation time for layer_1: 1314.682ms using MaxK
+2025-07-11 18:02:17,855 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-15823.4160, max=5078277.0000, mean=15624.1143, non-zero=1.0000
+2025-07-11 18:02:17,863 - MaxK-Debug - INFO - MaxK forward time: 7.495ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:17,864 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:17,890 - MaxK-Debug - INFO - MaxK SPMM stats for layer_2: min=0.0000, max=1906312576.0000, mean=4285928.0000, non-zero=0.8809
+2025-07-11 18:02:17,926 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_2: max_diff=1906216704.000000, mean_diff=4283668.000000
+2025-07-11 18:02:17,926 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_2!
+2025-07-11 18:02:17,927 - MaxK-Debug - WARNING - Found 59639018 positions with diff > 0.1
+2025-07-11 18:02:19,178 - MaxK-Debug - WARNING - Position [9738,153]: MaxK=2999527.7500, DGL=5773.1152, Diff=2993754.7500
+2025-07-11 18:02:19,179 - MaxK-Debug - WARNING - Position [59749,83]: MaxK=33821.3555, DGL=-34856.1602, Diff=68677.5156
+2025-07-11 18:02:19,179 - MaxK-Debug - WARNING - Position [97255,132]: MaxK=104817.3281, DGL=-15951.4658, Diff=120768.7969
+2025-07-11 18:02:19,179 - MaxK-Debug - WARNING - Position [24825,14]: MaxK=2795118.2500, DGL=-7127.2925, Diff=2802245.5000
+2025-07-11 18:02:19,179 - MaxK-Debug - WARNING - Position [161987,100]: MaxK=750380.9375, DGL=36486.1758, Diff=713894.7500
+2025-07-11 18:02:19,179 - MaxK-Debug - INFO - Aggregation time for layer_2: 1312.320ms using MaxK
+2025-07-11 18:02:19,184 - MaxK-Debug - INFO - Forward pass time: 4205.036ms
+2025-07-11 18:02:19,184 - MaxK-Debug - INFO - Feature statistics summary (9 points):
+2025-07-11 18:02:19,184 - MaxK-Debug - INFO -   after_maxk_2: min=-0.0000, max=5078277.0000, mean=7004.2378, non_zero=0.1250
+2025-07-11 18:02:19,184 - MaxK-Debug - INFO -   after_layer_2: min=-3820678.0000, max=1905917568.0000, mean=4285723.5000, non_zero=1.0000
+2025-07-11 18:02:19,184 - MaxK-Debug - INFO -   output: min=-701349312.0000, max=1022121216.0000, mean=1071934.7500, non_zero=1.0000
+2025-07-11 18:02:19,335 - MaxK-Debug - WARNING - Large gradient detected in lin_out.weight: min=-4613848.0000, max=38459416.0000
+2025-07-11 18:02:19,352 - MaxK-Debug - WARNING - Large gradient detected in layers.2.fc_neigh.bias: min=-26.6873, max=40.5458
+2025-07-11 18:02:19,352 - MaxK-Debug - WARNING - Large gradient detected in layers.2.fc_neigh.weight: min=-3554806.7500, max=5582861.0000
+2025-07-11 18:02:19,354 - MaxK-Debug - WARNING - Large gradient detected in layers.2.fc_self.weight: min=-18116.2656, max=16574.8672
+2025-07-11 18:02:19,356 - MaxK-Debug - INFO - MaxK backward - Grad stats: min=-0.0209, max=0.0210, mean=0.0000, non-zero=0.4996
+2025-07-11 18:02:20,166 - MaxK-Debug - INFO - MaxK backward time: 810.072ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:20,167 - MaxK-Debug - INFO - MaxK backward - Output grad stats: sparsity=0.9376, shape=torch.Size([232965, 256])
+2025-07-11 18:02:20,183 - MaxK-Debug - WARNING - Large gradient detected in layers.1.fc_neigh.bias: min=-1126.0144, max=11484.1367
+2025-07-11 18:02:20,184 - MaxK-Debug - WARNING - Large gradient detected in layers.1.fc_neigh.weight: min=-455891.8125, max=4510356.0000
+2025-07-11 18:02:20,185 - MaxK-Debug - WARNING - Large gradient detected in layers.1.fc_self.weight: min=-2059.1211, max=12405.8369
+2025-07-11 18:02:20,187 - MaxK-Debug - INFO - MaxK backward - Grad stats: min=-3.2517, max=3.8677, mean=0.0015, non-zero=0.5000
+2025-07-11 18:02:21,036 - MaxK-Debug - INFO - MaxK backward time: 849.349ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:21,037 - MaxK-Debug - INFO - MaxK backward - Output grad stats: sparsity=0.9375, shape=torch.Size([232965, 256])
+2025-07-11 18:02:21,053 - MaxK-Debug - WARNING - Large gradient detected in layers.0.fc_neigh.bias: min=-58555.8867, max=725565.0000
+2025-07-11 18:02:21,053 - MaxK-Debug - WARNING - Large gradient detected in layers.0.fc_neigh.weight: min=-46548.3984, max=469893.1250
+2025-07-11 18:02:21,055 - MaxK-Debug - WARNING - Large gradient detected in layers.0.fc_self.weight: min=-159.4805, max=1770.9980
+2025-07-11 18:02:21,057 - MaxK-Debug - INFO - MaxK backward - Grad stats: min=-581.0108, max=712.6693, mean=0.4689, non-zero=0.5001
+2025-07-11 18:02:21,836 - MaxK-Debug - INFO - MaxK backward time: 779.657ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:21,837 - MaxK-Debug - INFO - MaxK backward - Output grad stats: sparsity=0.9375, shape=torch.Size([232965, 256])
+2025-07-11 18:02:21,840 - MaxK-Debug - WARNING - Large gradient detected in lin_in.bias: min=-15114.6816, max=232429.2812
+2025-07-11 18:02:21,840 - MaxK-Debug - WARNING - Large gradient detected in lin_in.weight: min=-113275.2578, max=808825.5000
+2025-07-11 18:02:21,911 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-26.7275, max=21.5263, mean=-0.0189, non-zero=1.0000
+2025-07-11 18:02:21,918 - MaxK-Debug - INFO - MaxK forward time: 7.080ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:21,919 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:21,945 - MaxK-Debug - INFO - MaxK SPMM stats for layer_0: min=0.0000, max=66030.6172, mean=52.3690, non-zero=0.8896
+2025-07-11 18:02:21,981 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_0: max_diff=66024.656250, mean_diff=52.658543
+2025-07-11 18:02:21,981 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_0!
+2025-07-11 18:02:21,982 - MaxK-Debug - WARNING - Found 59289273 positions with diff > 0.1
+2025-07-11 18:02:23,223 - MaxK-Debug - WARNING - Position [216997,248]: MaxK=2.5280, DGL=-0.3016, Diff=2.8297
+2025-07-11 18:02:23,223 - MaxK-Debug - WARNING - Position [96228,109]: MaxK=1.8230, DGL=-0.2735, Diff=2.0965
+2025-07-11 18:02:23,223 - MaxK-Debug - WARNING - Position [209224,225]: MaxK=4.1544, DGL=-0.2593, Diff=4.4138
+2025-07-11 18:02:23,223 - MaxK-Debug - WARNING - Position [200367,180]: MaxK=2.9969, DGL=-0.4221, Diff=3.4190
+2025-07-11 18:02:23,223 - MaxK-Debug - WARNING - Position [122457,217]: MaxK=408.2886, DGL=0.8974, Diff=407.3912
+2025-07-11 18:02:23,224 - MaxK-Debug - INFO - Aggregation time for layer_0: 1301.322ms using MaxK
+2025-07-11 18:02:23,228 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-21.5507, max=66032.7031, mean=52.0496, non-zero=1.0000
+2025-07-11 18:02:23,236 - MaxK-Debug - INFO - MaxK forward time: 7.485ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:23,237 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:23,263 - MaxK-Debug - INFO - MaxK SPMM stats for layer_1: min=0.0000, max=7373858.5000, mean=8040.0581, non-zero=0.5735
+2025-07-11 18:02:23,299 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_1: max_diff=7373499.500000, mean_diff=8092.604980
+2025-07-11 18:02:23,299 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_1!
+2025-07-11 18:02:23,300 - MaxK-Debug - WARNING - Found 59625443 positions with diff > 0.1
+2025-07-11 18:02:24,549 - MaxK-Debug - WARNING - Position [76674,133]: MaxK=736.6838, DGL=44.4136, Diff=692.2702
+2025-07-11 18:02:24,549 - MaxK-Debug - WARNING - Position [172428,144]: MaxK=94.5961, DGL=-28.1398, Diff=122.7359
+2025-07-11 18:02:24,549 - MaxK-Debug - WARNING - Position [56079,131]: MaxK=43.0781, DGL=-8.9965, Diff=52.0746
+2025-07-11 18:02:24,549 - MaxK-Debug - WARNING - Position [222444,123]: MaxK=0.0000, DGL=-112.6590, Diff=112.6590
+2025-07-11 18:02:24,549 - MaxK-Debug - WARNING - Position [136464,34]: MaxK=9834.9854, DGL=119.7894, Diff=9715.1963
+2025-07-11 18:02:24,549 - MaxK-Debug - INFO - Aggregation time for layer_1: 1309.338ms using MaxK
+2025-07-11 18:02:24,554 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-59555.3477, max=7380036.5000, mean=7998.3032, non-zero=1.0000
+2025-07-11 18:02:24,561 - MaxK-Debug - INFO - MaxK forward time: 6.990ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:24,562 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:24,588 - MaxK-Debug - INFO - MaxK SPMM stats for layer_2: min=0.0000, max=2309446144.0000, mean=3650899.2500, non-zero=0.2803
+2025-07-11 18:02:24,624 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_2: max_diff=2309334272.000000, mean_diff=3661591.750000
+2025-07-11 18:02:24,624 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_2!
+2025-07-11 18:02:24,625 - MaxK-Debug - WARNING - Found 59638852 positions with diff > 0.1
+2025-07-11 18:02:25,872 - MaxK-Debug - WARNING - Position [83794,35]: MaxK=0.0000, DGL=-16263.8145, Diff=16263.8145
+2025-07-11 18:02:25,872 - MaxK-Debug - WARNING - Position [51324,87]: MaxK=187988.5156, DGL=30761.4199, Diff=157227.0938
+2025-07-11 18:02:25,873 - MaxK-Debug - WARNING - Position [169353,11]: MaxK=0.0000, DGL=-64481.7617, Diff=64481.7617
+2025-07-11 18:02:25,873 - MaxK-Debug - WARNING - Position [226616,177]: MaxK=0.0000, DGL=-27547.7305, Diff=27547.7305
+2025-07-11 18:02:25,873 - MaxK-Debug - WARNING - Position [157811,85]: MaxK=24395.6328, DGL=17069.1680, Diff=7326.4648
+2025-07-11 18:02:25,873 - MaxK-Debug - INFO - Aggregation time for layer_2: 1307.850ms using MaxK
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO - Forward pass time: 3971.362ms
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO - Feature statistics summary (9 points):
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   after_maxk_2: min=0.0000, max=7380036.5000, mean=6895.7070, non_zero=0.1250
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   after_layer_2: min=-4083421.2500, max=2309560320.0000, mean=3648379.2500, non_zero=1.0000
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   output: min=-3634250496.0000, max=2022639872.0000, mean=12453969.0000, non_zero=1.0000
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO - Gradient statistics summary (13 points):
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.2.fc_neigh.weight: min=-3554806.7500, max=5582861.0000, mean=8483.5039, norm=40502888.0000
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.2.fc_self.weight: min=-18116.2656, max=16574.8672, mean=94.8651, norm=413182.2812
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.1.fc_neigh.bias: min=-1126.0144, max=11484.1367, mean=256.1575, norm=18863.7324
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.1.fc_neigh.weight: min=-455891.8125, max=4510356.0000, mean=7931.2759, norm=22019194.0000
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.1.fc_self.weight: min=-2059.1211, max=12405.8369, mean=35.2867, norm=80006.2969
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.0.fc_neigh.bias: min=-58555.8867, max=725565.0000, mean=46200.7734, norm=2169040.2500
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.0.fc_neigh.weight: min=-46548.3984, max=469893.1250, mean=8557.4668, norm=7372485.5000
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   layers.0.fc_self.weight: min=-159.4805, max=1770.9980, mean=59.8879, norm=43322.2383
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   lin_in.bias: min=-15114.6816, max=232429.2812, mean=53940.1953, norm=1064030.1250
+2025-07-11 18:02:25,877 - MaxK-Debug - INFO -   lin_in.weight: min=-113275.2578, max=808825.5000, mean=11.3417, norm=5748243.5000
+Epoch 0000/1000| Loss 21536274.0000 | Train Accuracy 0.0168 | Val Accuracy 0.0167 | Test Accuracy 0.0148 | Best val. Accuracy 0.0167 | Best test Accuracy 0.0148
+2025-07-11 18:02:25,885 - GNN_Training - INFO - Epoch 0000/1000| Loss 21536274.0000 | Train Accuracy 0.0168 | Val Accuracy 0.0167 | Test Accuracy 0.0148 | Best val. Accuracy 0.0167 | Best test Accuracy 0.0148
+2025-07-11 18:02:25,897 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-26.7275, max=21.5263, mean=-0.0189, non-zero=1.0000
+2025-07-11 18:02:25,904 - MaxK-Debug - INFO - MaxK forward time: 7.093ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:25,905 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:25,931 - MaxK-Debug - INFO - MaxK SPMM stats for layer_0: min=0.0000, max=63541.7539, mean=73.8058, non-zero=0.9340
+2025-07-11 18:02:25,967 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_0: max_diff=63535.542969, mean_diff=74.094696
+2025-07-11 18:02:25,967 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_0!
+2025-07-11 18:02:25,968 - MaxK-Debug - WARNING - Found 59347646 positions with diff > 0.1
+2025-07-11 18:02:27,207 - MaxK-Debug - WARNING - Position [229563,39]: MaxK=33.5674, DGL=-0.1205, Diff=33.6879
+2025-07-11 18:02:27,207 - MaxK-Debug - WARNING - Position [211027,45]: MaxK=0.7351, DGL=-0.4975, Diff=1.2326
+2025-07-11 18:02:27,207 - MaxK-Debug - WARNING - Position [69393,128]: MaxK=12.2408, DGL=-0.0492, Diff=12.2900
+2025-07-11 18:02:27,207 - MaxK-Debug - WARNING - Position [32690,27]: MaxK=315.8823, DGL=0.5452, Diff=315.3371
+2025-07-11 18:02:27,207 - MaxK-Debug - WARNING - Position [207004,140]: MaxK=43.8235, DGL=-0.2940, Diff=44.1175
+2025-07-11 18:02:27,207 - MaxK-Debug - INFO - Aggregation time for layer_0: 1299.339ms using MaxK
+2025-07-11 18:02:27,212 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-33.2052, max=63543.6797, mean=73.4863, non-zero=1.0000
+2025-07-11 18:02:27,220 - MaxK-Debug - INFO - MaxK forward time: 7.614ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:27,221 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:27,248 - MaxK-Debug - INFO - MaxK SPMM stats for layer_1: min=0.0000, max=7517568.0000, mean=12978.9678, non-zero=0.8628
+2025-07-11 18:02:27,284 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_1: max_diff=7517194.500000, mean_diff=13033.803711
+2025-07-11 18:02:27,284 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_1!
+2025-07-11 18:02:27,285 - MaxK-Debug - WARNING - Found 59636219 positions with diff > 0.1
+2025-07-11 18:02:28,531 - MaxK-Debug - WARNING - Position [16078,178]: MaxK=2.7471, DGL=-257.2180, Diff=259.9651
+2025-07-11 18:02:28,531 - MaxK-Debug - WARNING - Position [194268,127]: MaxK=21257.9434, DGL=-51.5389, Diff=21309.4824
+2025-07-11 18:02:28,531 - MaxK-Debug - WARNING - Position [39113,2]: MaxK=52.6331, DGL=-224.4674, Diff=277.1005
+2025-07-11 18:02:28,531 - MaxK-Debug - WARNING - Position [95712,116]: MaxK=307.2049, DGL=-188.6709, Diff=495.8758
+2025-07-11 18:02:28,531 - MaxK-Debug - WARNING - Position [9499,250]: MaxK=3802.2874, DGL=-18.9722, Diff=3821.2595
+2025-07-11 18:02:28,531 - MaxK-Debug - INFO - Aggregation time for layer_1: 1306.967ms using MaxK
+2025-07-11 18:02:28,536 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-91128.5469, max=7529119.5000, mean=12934.3379, non-zero=1.0000
+2025-07-11 18:02:28,543 - MaxK-Debug - INFO - MaxK forward time: 7.396ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:28,544 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:28,571 - MaxK-Debug - INFO - MaxK SPMM stats for layer_2: min=0.0000, max=2191378944.0000, mean=4573115.0000, non-zero=0.7796
+2025-07-11 18:02:28,607 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_2: max_diff=2191275520.000000, mean_diff=4578669.500000
+2025-07-11 18:02:28,607 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_2!
+2025-07-11 18:02:28,608 - MaxK-Debug - WARNING - Found 59639027 positions with diff > 0.1
+2025-07-11 18:02:29,852 - MaxK-Debug - WARNING - Position [20648,83]: MaxK=0.0000, DGL=-6636.5498, Diff=6636.5498
+2025-07-11 18:02:29,853 - MaxK-Debug - WARNING - Position [198411,155]: MaxK=5086145.5000, DGL=40876.9023, Diff=5045268.5000
+2025-07-11 18:02:29,853 - MaxK-Debug - WARNING - Position [162922,3]: MaxK=0.0000, DGL=-49381.4531, Diff=49381.4531
+2025-07-11 18:02:29,853 - MaxK-Debug - WARNING - Position [61555,211]: MaxK=0.0000, DGL=-89757.6172, Diff=89757.6172
+2025-07-11 18:02:29,853 - MaxK-Debug - WARNING - Position [174698,156]: MaxK=673631.0625, DGL=6942.7993, Diff=666688.2500
+2025-07-11 18:02:29,853 - MaxK-Debug - INFO - Aggregation time for layer_2: 1305.529ms using MaxK
+2025-07-11 18:02:29,857 - MaxK-Debug - INFO - Forward pass time: 3965.634ms
+2025-07-11 18:02:29,857 - MaxK-Debug - INFO - Feature statistics summary (9 points):
+2025-07-11 18:02:29,857 - MaxK-Debug - INFO -   after_maxk_2: min=-0.0000, max=7529119.5000, mean=6926.2446, non_zero=0.1250
+2025-07-11 18:02:29,857 - MaxK-Debug - INFO -   after_layer_2: min=-7343671.5000, max=2193036544.0000, mean=4570812.5000, non_zero=1.0000
+2025-07-11 18:02:29,857 - MaxK-Debug - INFO -   output: min=-3408831232.0000, max=1809433344.0000, mean=13787705.0000, non_zero=1.0000
+2025-07-11 18:02:29,866 - MaxK-Debug - WARNING - Large gradient detected in lin_out.weight: min=-5224946.5000, max=39018916.0000
+2025-07-11 18:02:29,882 - MaxK-Debug - WARNING - Large gradient detected in layers.2.fc_neigh.bias: min=-27.4033, max=50.4416
+2025-07-11 18:02:29,882 - MaxK-Debug - WARNING - Large gradient detected in layers.2.fc_neigh.weight: min=-7031503.0000, max=10704645.0000
+2025-07-11 18:02:29,884 - MaxK-Debug - WARNING - Large gradient detected in layers.2.fc_self.weight: min=-22075.3613, max=26096.4414
+2025-07-11 18:02:29,886 - MaxK-Debug - INFO - MaxK backward - Grad stats: min=-0.0214, max=0.0193, mean=0.0000, non-zero=0.4996
+2025-07-11 18:02:30,685 - MaxK-Debug - INFO - MaxK backward time: 799.442ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:30,686 - MaxK-Debug - INFO - MaxK backward - Output grad stats: sparsity=0.9376, shape=torch.Size([232965, 256])
+2025-07-11 18:02:30,702 - MaxK-Debug - WARNING - Large gradient detected in layers.1.fc_neigh.bias: min=-1697.4781, max=16732.5996
+2025-07-11 18:02:30,703 - MaxK-Debug - WARNING - Large gradient detected in layers.1.fc_neigh.weight: min=-730716.5000, max=5937889.5000
+2025-07-11 18:02:30,704 - MaxK-Debug - WARNING - Large gradient detected in layers.1.fc_self.weight: min=-3988.8481, max=14416.6543
+2025-07-11 18:02:30,706 - MaxK-Debug - INFO - MaxK backward - Grad stats: min=-4.2255, max=5.5323, mean=0.0043, non-zero=0.5000
+2025-07-11 18:02:31,527 - MaxK-Debug - INFO - MaxK backward time: 820.590ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:31,527 - MaxK-Debug - INFO - MaxK backward - Output grad stats: sparsity=0.9375, shape=torch.Size([232965, 256])
+2025-07-11 18:02:31,544 - MaxK-Debug - WARNING - Large gradient detected in layers.0.fc_neigh.bias: min=-170834.0625, max=2425658.2500
+2025-07-11 18:02:31,544 - MaxK-Debug - WARNING - Large gradient detected in layers.0.fc_neigh.weight: min=-132530.6250, max=1988816.0000
+2025-07-11 18:02:31,545 - MaxK-Debug - WARNING - Large gradient detected in layers.0.fc_self.weight: min=-944.3348, max=6612.3447
+2025-07-11 18:02:31,547 - MaxK-Debug - INFO - MaxK backward - Grad stats: min=-788.5964, max=1043.3130, mean=1.2693, non-zero=0.5000
+2025-07-11 18:02:32,318 - MaxK-Debug - INFO - MaxK backward time: 770.607ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:32,319 - MaxK-Debug - INFO - MaxK backward - Output grad stats: sparsity=0.9375, shape=torch.Size([232965, 256])
+2025-07-11 18:02:32,321 - MaxK-Debug - WARNING - Large gradient detected in lin_in.bias: min=-65012.1094, max=912790.5000
+2025-07-11 18:02:32,321 - MaxK-Debug - WARNING - Large gradient detected in lin_in.weight: min=-463397.8750, max=1687301.1250
+2025-07-11 18:02:32,335 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-29.1000, max=26.3493, mean=-0.0391, non-zero=1.0000
+2025-07-11 18:02:32,343 - MaxK-Debug - INFO - MaxK forward time: 7.025ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:32,344 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:32,369 - MaxK-Debug - INFO - MaxK SPMM stats for layer_0: min=-0.0053, max=93797.3047, mean=33.2637, non-zero=0.9079
+2025-07-11 18:02:32,406 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_0: max_diff=93788.664062, mean_diff=33.803204
+2025-07-11 18:02:32,406 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_0!
+2025-07-11 18:02:32,407 - MaxK-Debug - WARNING - Found 59384055 positions with diff > 0.1
+2025-07-11 18:02:33,651 - MaxK-Debug - WARNING - Position [158420,31]: MaxK=0.5765, DGL=-0.4051, Diff=0.9816
+2025-07-11 18:02:33,651 - MaxK-Debug - WARNING - Position [45507,119]: MaxK=0.7112, DGL=-1.0023, Diff=1.7135
+2025-07-11 18:02:33,651 - MaxK-Debug - WARNING - Position [88272,8]: MaxK=30.0414, DGL=0.0712, Diff=29.9702
+2025-07-11 18:02:33,651 - MaxK-Debug - WARNING - Position [44554,132]: MaxK=63.0418, DGL=0.1501, Diff=62.8917
+2025-07-11 18:02:33,651 - MaxK-Debug - WARNING - Position [52365,227]: MaxK=0.0000, DGL=-0.1626, Diff=0.1626
+2025-07-11 18:02:33,651 - MaxK-Debug - INFO - Aggregation time for layer_0: 1304.803ms using MaxK
+2025-07-11 18:02:33,656 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-42.6423, max=93798.8750, mean=32.6380, non-zero=1.0000
+2025-07-11 18:02:33,664 - MaxK-Debug - INFO - MaxK forward time: 7.547ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:33,665 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:33,691 - MaxK-Debug - INFO - MaxK SPMM stats for layer_1: min=0.0000, max=3861713.0000, mean=4448.9912, non-zero=0.5556
+2025-07-11 18:02:33,727 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_1: max_diff=3861528.250000, mean_diff=4491.186523
+2025-07-11 18:02:33,727 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_1!
+2025-07-11 18:02:33,728 - MaxK-Debug - WARNING - Found 59625011 positions with diff > 0.1
+2025-07-11 18:02:34,972 - MaxK-Debug - WARNING - Position [125432,44]: MaxK=0.0000, DGL=-144.3427, Diff=144.3427
+2025-07-11 18:02:34,973 - MaxK-Debug - WARNING - Position [106647,76]: MaxK=23.5379, DGL=-86.8809, Diff=110.4188
+2025-07-11 18:02:34,973 - MaxK-Debug - WARNING - Position [206461,130]: MaxK=103296.7344, DGL=59.8710, Diff=103236.8672
+2025-07-11 18:02:34,973 - MaxK-Debug - WARNING - Position [41838,60]: MaxK=0.0000, DGL=-141.9121, Diff=141.9121
+2025-07-11 18:02:34,973 - MaxK-Debug - WARNING - Position [46691,127]: MaxK=2.1057, DGL=-47.3755, Diff=49.4812
+2025-07-11 18:02:34,973 - MaxK-Debug - INFO - Aggregation time for layer_1: 1305.014ms using MaxK
+2025-07-11 18:02:34,978 - MaxK-Debug - INFO - MaxK forward - Input stats: min=-70452.1328, max=3863623.2500, mean=4404.4771, non-zero=1.0000
+2025-07-11 18:02:34,985 - MaxK-Debug - INFO - MaxK forward time: 7.004ms for shape torch.Size([232965, 256])
+2025-07-11 18:02:34,986 - MaxK-Debug - INFO - MaxK forward - Output stats: sparsity=0.8750, k=32, shape=torch.Size([232965, 256])
+2025-07-11 18:02:35,012 - MaxK-Debug - INFO - MaxK SPMM stats for layer_2: min=0.0000, max=1581288960.0000, mean=1962244.6250, non-zero=0.2828
+2025-07-11 18:02:35,048 - MaxK-Debug - INFO - MaxK vs DGL comparison for layer_2: max_diff=1581212160.000000, mean_diff=1969111.750000
+2025-07-11 18:02:35,048 - MaxK-Debug - WARNING - ⚠️ Large difference between MaxK and DGL results in layer_2!
+2025-07-11 18:02:35,049 - MaxK-Debug - WARNING - Found 59638671 positions with diff > 0.1
+2025-07-11 18:02:36,294 - MaxK-Debug - WARNING - Position [165278,73]: MaxK=11186966.0000, DGL=22931.8984, Diff=11164034.0000
+2025-07-11 18:02:36,294 - MaxK-Debug - WARNING - Position [196639,249]: MaxK=0.0000, DGL=5279.2607, Diff=5279.2607
+2025-07-11 18:02:36,294 - MaxK-Debug - WARNING - Position [204086,168]: MaxK=0.0000, DGL=-5943.3247, Diff=5943.3247
+2025-07-11 18:02:36,294 - MaxK-Debug - WARNING - Position [87561,117]: MaxK=0.0000, DGL=-29229.8066, Diff=29229.8066
+2025-07-11 18:02:36,294 - MaxK-Debug - WARNING - Position [50721,99]: MaxK=0.0000, DGL=-33357.0898, Diff=33357.0898
+2025-07-11 18:02:36,294 - MaxK-Debug - INFO - Aggregation time for layer_2: 1305.396ms using MaxK
+2025-07-11 18:02:36,298 - MaxK-Debug - INFO - Forward pass time: 3969.329ms
+2025-07-11 18:02:36,298 - MaxK-Debug - INFO - Feature statistics summary (9 points):
+2025-07-11 18:02:36,298 - MaxK-Debug - INFO -   after_maxk_2: min=-0.0000, max=3863623.2500, mean=3740.5632, non_zero=0.1250
+2025-07-11 18:02:36,298 - MaxK-Debug - INFO -   after_layer_2: min=-2963997.5000, max=1581414656.0000, mean=1960603.7500, non_zero=1.0000
+2025-07-11 18:02:36,298 - MaxK-Debug - INFO -   output: min=-1816263680.0000, max=1286376704.0000, mean=8400036.0000, non_zero=1.0000
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO - Gradient statistics summary (13 points):
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.2.fc_neigh.weight: min=-7031503.0000, max=10704645.0000, mean=8123.9731, norm=49109320.0000
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.2.fc_self.weight: min=-22075.3613, max=26096.4414, mean=18.0839, norm=368588.2188
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.1.fc_neigh.bias: min=-1697.4781, max=16732.5996, mean=402.5091, norm=27226.1270
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.1.fc_neigh.weight: min=-730716.5000, max=5937889.5000, mean=11130.5684, norm=33245290.0000
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.1.fc_self.weight: min=-3988.8481, max=14416.6543, mean=43.1784, norm=118640.3750
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.0.fc_neigh.bias: min=-170834.0625, max=2425658.2500, mean=87689.8125, norm=5031165.0000
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.0.fc_neigh.weight: min=-132530.6250, max=1988816.0000, mean=10644.0459, norm=12139723.0000
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   layers.0.fc_self.weight: min=-944.3348, max=6612.3447, mean=55.1137, norm=50676.3125
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   lin_in.bias: min=-65012.1094, max=912790.5000, mean=92467.1875, norm=2307320.0000
+2025-07-11 18:02:36,299 - MaxK-Debug - INFO -   lin_in.weight: min=-463397.8750, max=1687301.1250, mean=-116.9084, norm=11252223.0000
+Epoch 0001/1000| Loss 26755130.0000 | Train Accuracy 0.0183 | Val Accuracy 0.0167 | Test Accuracy 0.0157 | Best val. Accuracy 0.0167 | Best test Accuracy 0.0157
