@@ -477,3 +477,30 @@ def test_normalization_fix():
 
 if __name__ == "__main__":
     test_normalization_fix()
+
+
+
+
+
+def forward(self, graph, feat):
+    with graph.local_scope():
+        feat = self.feat_drop(feat)
+        h_self = feat  # Don't transform self yet!
+        
+        # Apply DGL's lin_before_mp logic
+        lin_before_mp = self.in_feats > self.out_feats
+        
+        if lin_before_mp:
+            # Transform then aggregate
+            feat_neigh = self.fc_neigh(feat)
+            h_neigh_sum = self.maxk_wrapper.spmm(...)
+        else:
+            # Aggregate then transform  
+            h_neigh_sum = self.maxk_wrapper.spmm(feat, ...)  # Raw features
+            h_neigh_mean = h_neigh_sum / self.node_degrees.unsqueeze(-1)
+            h_neigh = self.fc_neigh(h_neigh_mean)
+            return self.fc_self(h_self) + h_neigh
+        
+        # For lin_before_mp case
+        h_neigh = h_neigh_sum / self.node_degrees.unsqueeze(-1)
+        return self.fc_self(h_self) + h_neigh
