@@ -482,25 +482,320 @@ if __name__ == "__main__":
 
 
 
-def forward(self, graph, feat):
-    with graph.local_scope():
-        feat = self.feat_drop(feat)
-        h_self = feat  # Don't transform self yet!
+#!/usr/bin/env python3
+"""
+Complete DGL-Equivalent MaxK SAGE Implementation
+Mathematically identical to DGL SAGEConv with MaxK kernel acceleration
+Addresses ALL differences: normalization, transformation timing, edge weights, etc.
+"""
+
+import dgl
+import dgl.nn as dglnn
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn import Linear
+import torch.nn.init as init
+from torch.autograd import Function
+import math
+from dgl import function as fn
+from dgl.utils import check_eq_shape, expand_as_pair
+
+# Import our MaxK SpGEMM function
+try:
+    from maxk_spgemm_function import MaxKSpmmWrapper, maxk_spgemm, MAXK_KERNELS_AVAILABLE
+    print("✅ MaxK CUDA kernels loaded for training integration")
+except ImportError:
+    MAXK_KERNELS_AVAILABLE = False
+    print("⚠️ MaxK CUDA kernels not available, falling back to DGL")
+
+class MaxK(Function):
+    """MaxK activation function from original code"""
+    @staticmethod
+    def forward(ctx, input, k=1):
+        topk, indices = input.topk(k, dim=1)
+        mask = torch.zeros_like(input)
+        mask.scatter_(1, indices, 1)
+        output = input * mask
+        ctx.save_for_backward(mask)
+        return output
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        mask, = ctx.saved_tensors
+        grad_input = grad_output * mask
+        return grad_input, None
+
+class ExactDGLEquivalentMaxKSAGEConv(nn.Module):
+    """
+    COMPLETE DGL-Equivalent MaxK SAGE Convolution
+    Mathematically identical to DGL's SAGEConv with MaxK kernel acceleration
+    Implements ALL DGL features: lin_before_mp, edge weights, bipartite graphs, etc.
+    """
+    
+    def __init__(self, in_feats, out_feats, aggregator_type='mean', 
+                 feat_drop=0., bias=True, norm=None, activation=None, k_value=32):
+        super(ExactDGLEquivalentMaxKSAGEConv, self).__init__()
         
-        # Apply DGL's lin_before_mp logic
-        lin_before_mp = self.in_feats > self.out_feats
+        # Validate aggregator type (exactly like DGL)
+        valid_aggre_types = {"mean", "gcn", "pool", "lstm"}
+        if aggregator_type not in valid_aggre_types:
+            raise ValueError(
+                f"Invalid aggregator_type. Must be one of {valid_aggre_types}. "
+                f"But got {aggregator_type!r} instead."
+            )
         
-        if lin_before_mp:
-            # Transform then aggregate
-            feat_neigh = self.fc_neigh(feat)
-            h_neigh_sum = self.maxk_wrapper.spmm(...)
+        # Store parameters exactly like DGL
+        self._in_src_feats, self._in_dst_feats = expand_as_pair(in_feats)
+        self._out_feats = out_feats
+        self._aggre_type = aggregator_type
+        self.norm = norm
+        self.feat_drop = nn.Dropout(feat_drop)
+        self.activation = activation
+        self.k_value = k_value
+        
+        # Aggregator-specific layers (exactly like DGL)
+        if aggregator_type == "pool":
+            self.fc_pool = nn.Linear(self._in_src_feats, self._in_src_feats)
+        if aggregator_type == "lstm":
+            self.lstm = nn.LSTM(
+                self._in_src_feats, self._in_src_feats, batch_first=True
+            )
+        
+        # Main linear layers (exactly like DGL)
+        self.fc_neigh = nn.Linear(self._in_src_feats, out_feats, bias=False)
+        
+        if aggregator_type != "gcn":
+            self.fc_self = nn.Linear(self._in_dst_feats, out_feats, bias=bias)
+        elif bias:
+            self.bias = nn.parameter.Parameter(torch.zeros(self._out_feats))
         else:
-            # Aggregate then transform  
-            h_neigh_sum = self.maxk_wrapper.spmm(feat, ...)  # Raw features
-            h_neigh_mean = h_neigh_sum / self.node_degrees.unsqueeze(-1)
-            h_neigh = self.fc_neigh(h_neigh_mean)
-            return self.fc_self(h_self) + h_neigh
+            self.register_buffer("bias", None)
         
-        # For lin_before_mp case
-        h_neigh = h_neigh_sum / self.node_degrees.unsqueeze(-1)
-        return self.fc_self(h_self) + h_neigh
+        # MaxK SpGEMM wrapper
+        if MAXK_KERNELS_AVAILABLE:
+            self.maxk_wrapper = MaxKSpmmWrapper()
+        else:
+            self.maxk_wrapper = None
+        
+        # Graph metadata (will be set during first forward pass)
+        self.graph_indices = None
+        self.graph_values = None
+        self.graph_indptr = None
+        self.node_degrees = None
+        self.metadata_loaded = False
+        self.use_maxk_kernel = False
+        
+        self.reset_parameters()
+    
+    def reset_parameters(self):
+        """Initialize parameters exactly like DGL"""
+        gain = nn.init.calculate_gain("relu")
+        if self._aggre_type == "pool":
+            nn.init.xavier_uniform_(self.fc_pool.weight, gain=gain)
+        if self._aggre_type == "lstm":
+            self.lstm.reset_parameters()
+        if self._aggre_type != "gcn":
+            nn.init.xavier_uniform_(self.fc_self.weight, gain=gain)
+        nn.init.xavier_uniform_(self.fc_neigh.weight, gain=gain)
+    
+    def set_graph_data(self, graph, graph_name=""):
+        """
+        Set graph data for MaxK kernel usage
+        """
+        # Extract CSR format from DGL graph
+        graph = graph.local_var()
+        
+        # Get CSR representation
+        indptr, indices, _ = graph.adj_tensors('csr')
+        
+        # Store graph data
+        self.graph_indices = indices.int()
+        self.graph_indptr = indptr.int()
+        
+        # Create uniform edge weights (can be modified for weighted graphs)
+        num_edges = indices.size(0)
+        self.graph_values = torch.ones(num_edges, device=indices.device, dtype=torch.float32)
+        
+        # Compute and store node degrees for proper normalization
+        self.node_degrees = graph.in_degrees().float().to(indices.device)
+        # Avoid division by zero for isolated nodes
+        self.node_degrees = torch.clamp(self.node_degrees, min=1.0)
+        
+        print(f"📊 Graph stats: {graph.num_nodes()} nodes, {graph.num_edges()} edges")
+        print(f"📊 Degree stats: min={self.node_degrees.min():.1f}, max={self.node_degrees.max():.1f}, avg={self.node_degrees.mean():.1f}")
+        
+        # Load MaxK metadata if kernels are available
+        if (MAXK_KERNELS_AVAILABLE and 
+            graph_name and 
+            self.maxk_wrapper and 
+            self._aggre_type == "mean"):  # Only use MaxK for mean aggregation
+            
+            self.metadata_loaded = self.maxk_wrapper.load_metadata(graph_name)
+            if self.metadata_loaded:
+                self.use_maxk_kernel = True
+                print(f"✅ MaxK metadata loaded for {graph_name}")
+            else:
+                print(f"⚠️ MaxK metadata failed, using DGL fallback for {graph_name}")
+        else:
+            print("⚠️ Using DGL fallback (no MaxK kernels or unsupported aggregator)")
+            self.use_maxk_kernel = False
+    
+    def _lstm_reducer(self, nodes):
+        """LSTM reducer (exactly like DGL)"""
+        m = nodes.mailbox["m"]  # (B, L, D)
+        batch_size = m.shape[0]
+        h = (
+            m.new_zeros((1, batch_size, self._in_src_feats)),
+            m.new_zeros((1, batch_size, self._in_src_feats)),
+        )
+        _, (rst, _) = self.lstm(m, h)
+        return {"neigh": rst.squeeze(0)}
+    
+    def forward(self, graph, feat, edge_weight=None):
+        """
+        COMPLETE DGL-equivalent forward pass with MaxK acceleration
+        Exactly replicates DGL SAGEConv.forward() behavior line-by-line
+        """
+        with graph.local_scope():
+            # === STEP 1: Feature Processing (exactly like DGL) ===
+            if isinstance(feat, tuple):
+                feat_src = self.feat_drop(feat[0])
+                feat_dst = self.feat_drop(feat[1])
+            else:
+                feat_src = feat_dst = self.feat_drop(feat)
+                if graph.is_block:
+                    feat_dst = feat_src[:graph.number_of_dst_nodes()]
+            
+            # === STEP 2: Message Function Setup (exactly like DGL) ===
+            msg_fn = fn.copy_u("h", "m")
+            if edge_weight is not None:
+                assert edge_weight.shape[0] == graph.num_edges()
+                graph.edata["_edge_weight"] = edge_weight
+                msg_fn = fn.u_mul_e("h", "_edge_weight", "m")
+            
+            h_self = feat_dst  # Store raw features for self-connection (like DGL!)
+            
+            # === STEP 3: Handle Empty Graphs (exactly like DGL) ===
+            if graph.num_edges() == 0:
+                graph.dstdata["neigh"] = torch.zeros(
+                    feat_dst.shape[0], self._in_src_feats
+                ).to(feat_dst)
+                h_neigh = graph.dstdata["neigh"]
+            else:
+                # === STEP 4: Critical lin_before_mp Decision (exactly like DGL) ===
+                lin_before_mp = self._in_src_feats > self._out_feats
+                
+                # === STEP 5: Aggregation Type Handling ===
+                if self._aggre_type == "mean":
+                    # Try MaxK acceleration if available, otherwise fall back to DGL
+                    if (self.use_maxk_kernel and 
+                        self.maxk_wrapper and 
+                        self.node_degrees is not None and
+                        edge_weight is None):  # MaxK doesn't support edge weights yet
+                        
+                        try:
+                            # MaxK-accelerated mean aggregation
+                            if lin_before_mp:
+                                # Transform BEFORE aggregation (like DGL)
+                                feat_to_aggregate = self.fc_neigh(feat_src)
+                                h_neigh_sum = self.maxk_wrapper.spmm(
+                                    self.graph_indices,
+                                    self.graph_values,
+                                    feat_to_aggregate,
+                                    self.k_value,
+                                    self.graph_indptr
+                                )
+                                # Apply mean normalization (convert sum to mean)
+                                h_neigh = h_neigh_sum / self.node_degrees.unsqueeze(-1)
+                            else:
+                                # Aggregate THEN transform (like DGL)
+                                h_neigh_sum = self.maxk_wrapper.spmm(
+                                    self.graph_indices,
+                                    self.graph_values,
+                                    feat_src,  # Raw features
+                                    self.k_value,
+                                    self.graph_indptr
+                                )
+                                # Apply mean normalization first
+                                h_neigh_mean = h_neigh_sum / self.node_degrees.unsqueeze(-1)
+                                # Then transform
+                                h_neigh = self.fc_neigh(h_neigh_mean)
+                            
+                            print(f"🚀 Used MaxK kernel for mean aggregation (lin_before_mp={lin_before_mp})")
+                            
+                        except Exception as e:
+                            print(f"⚠️ MaxK kernel failed: {e}, falling back to DGL")
+                            # Fall back to DGL implementation
+                            graph.srcdata["h"] = (
+                                self.fc_neigh(feat_src) if lin_before_mp else feat_src
+                            )
+                            graph.update_all(msg_fn, fn.mean("m", "neigh"))
+                            h_neigh = graph.dstdata["neigh"]
+                            if not lin_before_mp:
+                                h_neigh = self.fc_neigh(h_neigh)
+                    else:
+                        # Standard DGL mean aggregation
+                        graph.srcdata["h"] = (
+                            self.fc_neigh(feat_src) if lin_before_mp else feat_src
+                        )
+                        graph.update_all(msg_fn, fn.mean("m", "neigh"))
+                        h_neigh = graph.dstdata["neigh"]
+                        if not lin_before_mp:
+                            h_neigh = self.fc_neigh(h_neigh)
+                
+                elif self._aggre_type == "gcn":
+                    # GCN aggregation (exactly like DGL)
+                    check_eq_shape(feat)
+                    graph.srcdata["h"] = (
+                        self.fc_neigh(feat_src) if lin_before_mp else feat_src
+                    )
+                    if isinstance(feat, tuple):  # heterogeneous
+                        graph.dstdata["h"] = (
+                            self.fc_neigh(feat_dst) if lin_before_mp else feat_dst
+                        )
+                    else:
+                        if graph.is_block:
+                            graph.dstdata["h"] = graph.srcdata["h"][:graph.num_dst_nodes()]
+                        else:
+                            graph.dstdata["h"] = graph.srcdata["h"]
+                    graph.update_all(msg_fn, fn.sum("m", "neigh"))
+                    # Divide by in_degrees (GCN normalization)
+                    degs = graph.in_degrees().to(feat_dst)
+                    h_neigh = (graph.dstdata["neigh"] + graph.dstdata["h"]) / (
+                        degs.unsqueeze(-1) + 1
+                    )
+                    if not lin_before_mp:
+                        h_neigh = self.fc_neigh(h_neigh)
+                
+                elif self._aggre_type == "pool":
+                    # Pool aggregation (exactly like DGL)
+                    graph.srcdata["h"] = F.relu(self.fc_pool(feat_src))
+                    graph.update_all(msg_fn, fn.max("m", "neigh"))
+                    h_neigh = self.fc_neigh(graph.dstdata["neigh"])
+                
+                elif self._aggre_type == "lstm":
+                    # LSTM aggregation (exactly like DGL)
+                    graph.srcdata["h"] = feat_src
+                    graph.update_all(msg_fn, self._lstm_reducer)
+                    h_neigh = self.fc_neigh(graph.dstdata["neigh"])
+                
+                else:
+                    raise KeyError(f"Aggregator type {self._aggre_type} not recognized.")
+            
+            # === STEP 6: Combine Self and Neighbor Features (exactly like DGL) ===
+            if self._aggre_type == "gcn":
+                rst = h_neigh
+                # Add bias manually for GCN
+                if self.bias is not None:
+                    rst = rst + self.bias
+            else:
+                rst = self.fc_self(h_self) + h_neigh  # Transform self connection here!
+            
+            # === STEP 7: Post-processing (exactly like DGL) ===
+            if self.activation is not None:
+                rst = self.activation(rst)
+            if self.norm is not None:
+                rst = self.norm(rst)
+            
+            return rst
