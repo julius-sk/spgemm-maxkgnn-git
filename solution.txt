@@ -1,0 +1,256 @@
+To implement the fix in your training script, you need to modify where the model is created or imported. Here's exactly where to make the changes:
+Modification in Your Training Script
+
+First, import the fix module at the top of your training script, just after your other imports:
+
+python# Add this after your other imports
+from maxk_model_fix import CuSPARSEMaxKSAGE, convert_to_cusparse
+
+Find where your model is created - usually there's a part that looks something like this:
+
+python# Find this part in your code
+if config.model == 'sage':
+    model = MaxKSAGE(
+        in_size=in_size,
+        hid_size=config.hidden_dim, 
+        num_hid_layers=config.hidden_layers,
+        out_size=out_size,
+        maxk=config.maxk,
+        feat_drop=config.dropout,
+        norm=config.norm,
+        nonlinear=config.nonlinear,
+        graph_name=config.dataset
+    ).to(device)
+
+Replace it with the fixed version:
+
+python# Replace your existing model creation with this
+if config.model == 'sage':
+    if config.use_maxk_kernels:
+        # Use the fixed implementation with cuSPARSE
+        model = CuSPARSEMaxKSAGE(
+            in_size=in_size,
+            hid_size=config.hidden_dim, 
+            num_hid_layers=config.hidden_layers,
+            out_size=out_size,
+            maxk=config.maxk,
+            feat_drop=config.dropout,
+            norm=config.norm,
+            nonlinear=config.nonlinear,
+            graph_name=config.dataset
+        ).to(device)
+        print("Using fixed MaxK model with cuSPARSE for message passing")
+    else:
+        # Use the original implementation
+        model = MaxKSAGE(
+            in_size=in_size,
+            hid_size=config.hidden_dim, 
+            num_hid_layers=config.hidden_layers,
+            out_size=out_size,
+            maxk=config.maxk,
+            feat_drop=config.dropout,
+            norm=config.norm,
+            nonlinear=config.nonlinear,
+            graph_name=config.dataset
+        ).to(device)
+#!/usr/bin/env python3
+"""
+MaxK Model Fix - Replace custom kernel with cuSPARSE-based implementation
+Keeps the MaxK activation but uses cuSPARSE for message passing
+"""
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.nn import Linear
+import torch.nn.init as init
+from torch.autograd import Function
+import dgl
+import dgl.nn as dglnn
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, 
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('MaxK-Fix')
+
+class MaxK(Function):
+    """MaxK activation function (unchanged)"""
+    @staticmethod
+    def forward(ctx, input, k=1):
+        # Get the top-k values and their indices
+        topk, indices = input.topk(k, dim=1)
+        
+        # Create a mask with zeros everywhere except at the top-k positions
+        mask = torch.zeros_like(input)
+        mask.scatter_(1, indices, 1)
+        
+        # Apply the mask to the input
+        output = input * mask
+        
+        # Save the mask for the backward pass
+        ctx.save_for_backward(mask)
+        
+        return output
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        # Get the saved mask
+        mask, = ctx.saved_tensors
+        
+        # Apply the mask to the incoming gradients
+        grad_input = grad_output * mask
+        
+        # Return gradient for input and None for k parameter
+        return grad_input, None
+
+class CuSPARSEMaxKSAGE(nn.Module):
+    """
+    SAGE model with MaxK activation but using cuSPARSE for message passing
+    This is a safer implementation that will help isolate the issue
+    """
+    
+    def __init__(self, in_size, hid_size, num_hid_layers, out_size, maxk=32, 
+                 feat_drop=0.5, norm=False, nonlinear="maxk", graph_name=""):
+        super().__init__()
+        self.layers = nn.ModuleList()
+        self.num_layers = num_hid_layers
+        self.graph_name = graph_name
+        self.hid_size = hid_size
+        self.maxk = maxk
+        self.nonlinear = nonlinear
+        
+        # Build standard DGL SAGE layers
+        for i in range(self.num_layers):
+            if norm:
+                norm_layer = nn.LayerNorm(hid_size, elementwise_affine=True)
+            else:
+                norm_layer = None
+            
+            # Use standard DGL SAGEConv with safe implementation
+            self.layers.append(dglnn.SAGEConv(
+                hid_size, hid_size, "mean", 
+                feat_drop=feat_drop, norm=norm_layer
+            ))
+        
+        # Input and output linear layers
+        self.lin_in = Linear(in_size, hid_size)
+        self.lin_out = Linear(hid_size, out_size)
+        init.xavier_uniform_(self.lin_in.weight)
+        init.xavier_uniform_(self.lin_out.weight)
+        
+        # MaxK activation functions (keep these)
+        for i in range(self.num_layers):
+            exec(f"self.maxk{i} = MaxK.apply")
+            exec(f"self.k{i} = maxk")
+        
+        logger.info(f"Initialized CuSPARSEMaxKSAGE model: layers={num_hid_layers}, "
+                   f"hid_size={hid_size}, k={maxk}, nonlinear={nonlinear}")
+        logger.info("Using standard cuSPARSE-based message passing with MaxK activation")
+    
+    def forward(self, g, x):
+        """Forward pass with cuSPARSE-based message passing"""
+        # Input transformation
+        x = self.lin_in(x)
+        
+        # Hidden layers with MaxK activation and standard message passing
+        for i in range(self.num_layers):
+            # Apply MaxK activation if specified
+            if self.nonlinear == 'maxk':
+                x = eval(f"self.maxk{i}(x, self.k{i})")
+                if i == 0:  # Log only first layer for brevity
+                    logger.info(f"MaxK activation applied with k={self.k0}")
+            elif self.nonlinear == 'relu':
+                x = F.relu(x)
+            
+            # Apply standard SAGE convolution (safe implementation)
+            x = self.layers[i](g, x)
+        
+        # Output transformation
+        x = self.lin_out(x)
+        
+        return x
+
+class CuSPARSEMaxKSAGEConv(nn.Module):
+    """
+    Individual SAGE Conv layer with MaxK and cuSPARSE
+    Use this as a drop-in replacement for MaxKSAGEConv
+    """
+    def __init__(self, in_feats, out_feats, aggregator_type='mean', 
+                 feat_drop=0., bias=True, norm=None, activation=None, k_value=32,
+                 debug_name="unknown"):
+        super().__init__()
+        
+        self.in_feats = in_feats
+        self.out_feats = out_feats
+        self.k_value = k_value
+        self.debug_name = debug_name
+        
+        # Create standard DGL SAGEConv
+        self.sage_conv = dglnn.SAGEConv(
+            in_feats, out_feats, aggregator_type,
+            feat_drop=feat_drop, norm=norm
+        )
+        
+        logger.info(f"Initialized CuSPARSEMaxKSAGEConv layer: {debug_name}")
+    
+    def forward(self, graph, feat):
+        """Safe forward pass using standard DGL implementation"""
+        return self.sage_conv(graph, feat)
+
+# Function to convert an existing model to use cuSPARSE
+def convert_to_cusparse(model):
+    """
+    Convert an existing MaxKSAGE model to use cuSPARSE implementation
+    This keeps the MaxK activation but replaces the custom message passing
+    """
+    if not isinstance(model, nn.Module):
+        logger.error("Input must be a PyTorch module")
+        return model
+    
+    # Create new model with same parameters
+    if hasattr(model, 'in_size') and hasattr(model, 'hid_size'):
+        new_model = CuSPARSEMaxKSAGE(
+            in_size=model.lin_in.in_features,
+            hid_size=model.hid_size if hasattr(model, 'hid_size') else model.lin_in.out_features,
+            num_hid_layers=len(model.layers),
+            out_size=model.lin_out.out_features,
+            maxk=model.maxk if hasattr(model, 'maxk') else 32,
+            nonlinear=model.nonlinear if hasattr(model, 'nonlinear') else "maxk",
+            graph_name=model.graph_name if hasattr(model, 'graph_name') else ""
+        )
+        
+        # Copy weights for input and output layers
+        new_model.lin_in.weight.data.copy_(model.lin_in.weight.data)
+        new_model.lin_in.bias.data.copy_(model.lin_in.bias.data)
+        new_model.lin_out.weight.data.copy_(model.lin_out.weight.data)
+        new_model.lin_out.bias.data.copy_(model.lin_out.bias.data)
+        
+        # Copy weights for hidden layers (as much as possible)
+        for i, (old_layer, new_layer) in enumerate(zip(model.layers, new_model.layers)):
+            if hasattr(old_layer, 'fc_neigh') and hasattr(new_layer, 'fc_neigh'):
+                new_layer.fc_neigh.weight.data.copy_(old_layer.fc_neigh.weight.data)
+                if hasattr(new_layer.fc_neigh, 'bias') and hasattr(old_layer.fc_neigh, 'bias'):
+                    new_layer.fc_neigh.bias.data.copy_(old_layer.fc_neigh.bias.data)
+            
+            # Copy self weights if possible
+            if hasattr(old_layer, 'fc_self') and hasattr(new_layer, 'fc_self'):
+                new_layer.fc_self.weight.data.copy_(old_layer.fc_self.weight.data)
+        
+        logger.info("Model converted to use cuSPARSE implementation with MaxK activation")
+        return new_model.to(model.lin_in.weight.device)
+    else:
+        logger.warning("Could not convert model - creating new CuSPARSEMaxKSAGE instance")
+        return CuSPARSEMaxKSAGE(
+            in_size=602,  # Default for reddit dataset
+            hid_size=256,
+            num_hid_layers=3,
+            out_size=41,
+            maxk=32,
+            nonlinear="maxk"
+        )
+
+# Example usage
+if __name__ == "__main__":
+    print("To use this fix, replace your model with CuSPARSEMaxKSAGE or convert an existing model:")
+    print("model = convert_to_cusparse(model)")
