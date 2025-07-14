@@ -1,0 +1,101 @@
+@staticmethod
+def forward(ctx, graph_indices, graph_values, input_features, k_value, 
+            warp4_metadata, num_warps, graph_indptr=None):
+    
+    # 🔍 DEBUG: Input analysis
+    print(f"\n🔍 MaxKSpGEMMFunction.forward() DEBUG:")
+    print(f"   input_features.shape: {input_features.shape}")
+    print(f"   input_features.device: {input_features.device}")
+    print(f"   k_value: {k_value}")
+    print(f"   input_features.dtype: {input_features.dtype}")
+    
+    # Check sparsity of input
+    non_zero_mask = (input_features != 0)
+    non_zero_per_row = non_zero_mask.sum(dim=1)
+    print(f"   input_features non-zeros per row: min={non_zero_per_row.min()}, max={non_zero_per_row.max()}, mean={non_zero_per_row.float().mean():.2f}")
+    print(f"   input_features value range: min={input_features.min():.6f}, max={input_features.max():.6f}")
+    
+    # Check if input is already sparse (from previous MaxK)
+    total_elements = input_features.numel()
+    non_zero_elements = (input_features != 0).sum().item()
+    sparsity_ratio = 1.0 - (non_zero_elements / total_elements)
+    print(f"   input_features sparsity: {sparsity_ratio:.3f} ({non_zero_elements}/{total_elements} non-zero)")
+    
+    # 🔍 DEBUG: MaxK selection analysis
+    if k_value < input_features.size(1):
+        print(f"\n🔍 Applying MaxK selection (k={k_value} < dim={input_features.size(1)}):")
+        
+        topk_values, topk_indices = torch.topk(input_features, k_value, dim=1)
+        sparse_data = topk_values
+        sparse_selector = topk_indices.to(torch.uint8)
+        
+        print(f"   topk_values.shape: {topk_values.shape}")
+        print(f"   topk_indices.shape: {topk_indices.shape}")
+        print(f"   sparse_data.shape: {sparse_data.shape}")
+        print(f"   sparse_selector.shape: {sparse_selector.shape}")
+        print(f"   sparse_data.dtype: {sparse_data.dtype}")
+        print(f"   sparse_selector.dtype: {sparse_selector.dtype}")
+        
+        # Check the values
+        print(f"   sparse_data value range: min={sparse_data.min():.6f}, max={sparse_data.max():.6f}")
+        print(f"   sparse_selector value range: min={sparse_selector.min()}, max={sparse_selector.max()}")
+        
+        # Check memory layout
+        print(f"   sparse_data is_contiguous: {sparse_data.is_contiguous()}")
+        print(f"   sparse_selector is_contiguous: {sparse_selector.is_contiguous()}")
+        
+    else:
+        print(f"\n🔍 No MaxK selection needed (k={k_value} >= dim={input_features.size(1)}):")
+        sparse_data = input_features
+        sparse_selector = torch.arange(input_features.size(1), 
+                                     device=input_features.device, 
+                                     dtype=torch.uint8).unsqueeze(0).expand(input_features.size(0), -1)
+        print(f"   sparse_data.shape: {sparse_data.shape}")
+        print(f"   sparse_selector.shape: {sparse_selector.shape}")
+    
+    # 🔍 DEBUG: Metadata check
+    print(f"\n🔍 Kernel metadata:")
+    print(f"   warp4_metadata is None: {warp4_metadata is None}")
+    if warp4_metadata is not None:
+        print(f"   warp4_metadata.shape: {warp4_metadata.shape}")
+        print(f"   warp4_metadata.device: {warp4_metadata.device}")
+    print(f"   num_warps: {num_warps}")
+    
+    # 🔍 DEBUG: Graph data
+    print(f"\n🔍 Graph data:")
+    print(f"   graph_indices.shape: {graph_indices.shape}")
+    print(f"   graph_values.shape: {graph_values.shape}")
+    print(f"   graph_indices.device: {graph_indices.device}")
+    print(f"   graph_values.device: {graph_values.device}")
+    
+    # Save for backward pass
+    ctx.save_for_backward(graph_indices, graph_values, sparse_selector)
+    ctx.k_value = k_value
+    ctx.warp4_metadata = warp4_metadata
+    ctx.num_warps = num_warps
+    ctx.input_shape = input_features.shape
+    ctx.graph_indptr = graph_indptr
+    
+    # Run MaxK forward kernel
+    if MAXK_KERNELS_AVAILABLE and warp4_metadata is not None:
+        try:
+            print(f"\n🔍 Calling CUDA kernel...")
+            output = maxk_cuda_kernels.spmm_maxk_forward(
+                warp4_metadata,
+                graph_indices,
+                graph_values,
+                sparse_data,
+                sparse_selector,
+                num_warps,
+                k_value
+            )
+            print(f"   ✅ CUDA kernel successful")
+            print(f"   output.shape: {output.shape}")
+            print(f"   output.device: {output.device}")
+            print(f"   output value range: min={output.min():.6f}, max={output.max():.6f}")
+            
+            return output
+        except Exception as e:
+            print(f"   ❌ CUDA kernel failed: {e}")
+            
+    print(f"   ⚠️ Using fallback implementation")
