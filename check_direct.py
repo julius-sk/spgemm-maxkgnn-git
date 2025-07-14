@@ -3,6 +3,7 @@
 Reddit Graph Structure Checker
 Comprehensive analysis to determine if Reddit graph is directed/undirected
 and whether transpose operations are needed for backward pass
+Uses the EXACT same loading method as your training code
 """
 
 import torch
@@ -10,25 +11,34 @@ import dgl
 import numpy as np
 import scipy.sparse as sp
 from collections import defaultdict
+from dgl.data import RedditDataset
+from dgl import AddSelfLoop
 import time
 
-def check_reddit_graph_structure(graph_path="./data/reddit.dgl"):
+def check_reddit_graph_structure(data_path="./data/"):
     """
-    Comprehensive check of Reddit graph structure
+    Comprehensive check of Reddit graph structure using your exact loading method
     """
     print("🔍 REDDIT GRAPH STRUCTURE ANALYSIS")
     print("=" * 60)
     
     try:
-        # Load Reddit graph
-        print("📂 Loading Reddit graph...")
-        graphs, labels = dgl.load_graphs(graph_path)
-        g = graphs[0]
-        print(f"✅ Graph loaded successfully")
+        # Load Reddit graph exactly like your code
+        print("📂 Loading Reddit graph using your method...")
+        from dgl.data import RedditDataset
+        from dgl import AddSelfLoop
+        
+        transform = AddSelfLoop()
+        data = RedditDataset(transform=transform, raw_dir=data_path)
+        g = data[0]
+        g = g.int()  # Convert to int like your code
+        
+        print(f"✅ Graph loaded successfully using RedditDataset")
         
     except Exception as e:
         print(f"❌ Failed to load graph: {e}")
-        print("💡 Make sure reddit.dgl exists in ./data/ directory")
+        print("💡 Make sure reddit dataset can be downloaded to your data_path")
+        print(f"💡 Trying data_path: {data_path}")
         return None
     
     # Basic properties
@@ -252,7 +262,11 @@ def create_test_graphs():
     print(f"  Symmetric edges: {len(symmetric_edges)}/{len(edge_set)}")
 
 if __name__ == "__main__":
-    # Run the analysis
+    # Run the analysis using your exact loading method
+    print("🚀 Using your exact Reddit loading method:")
+    print("   RedditDataset(transform=AddSelfLoop(), raw_dir=data_path)")
+    print()
+    
     result = check_reddit_graph_structure()
     
     # Create test graphs for verification
